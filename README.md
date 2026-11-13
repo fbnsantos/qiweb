@@ -26,6 +26,7 @@ config.php       ← configuração e segredos (copiar de config.sample.php; for
 | Painel | Visitas de hoje e dos últimos 30 dias, versão instalada, avisos |
 | Página inicial | Título, linha pequena, lema e frase do topo + o texto, num editor visual |
 | Páginas | Criar, editar e apagar as outras páginas (menu, endereço, descrição para o Google) |
+| Aspeto | Tema do site: **Escuro** (o original), **Claro** (brancos e cinzentos) ou **Personalizado** (cores, tipo de letra, cantos e grelha do topo à escolha) |
 | Estatísticas | Visualizações e visitantes por dia, páginas mais vistas, origens, países, dispositivos, robôs, erros 404 |
 | Imagens | Biblioteca de imagens e PDF |
 | Definições | Nome e descrição do site, rodapé, indexação no Google |

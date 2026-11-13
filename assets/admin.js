@@ -76,7 +76,7 @@
             skin: dark ? 'oxide-dark' : 'oxide',
             content_css: window.EDITOR_CSS,
             body_class: 'prose',
-            content_style: 'body{max-width:760px;margin:24px auto;padding:0 20px}',
+            content_style: window.EDITOR_STYLE || '',
             plugins: 'autolink link image media lists table code fullscreen wordcount autoresize searchreplace',
             toolbar: 'blocks | bold italic underline strikethrough | bullist numlist blockquote | link image media table | alignleft aligncenter alignright | removeformat code fullscreen',
             block_formats: 'Parágrafo=p; Título 2=h2; Título 3=h3; Título 4=h4; Código=pre',
@@ -150,6 +150,38 @@
                 // Ctrl/Cmd+S guarda.
                 ed.addShortcut('meta+s', 'Guardar', () => form.requestSubmit());
             },
+        });
+    }
+
+
+    // Aspeto: a pré-visualização do tema personalizado acompanha as cores, a letra e os cantos escolhidos.
+    const appearance = document.getElementById('appearance-form');
+    if (appearance) {
+        const preview = appearance.querySelector('input[name="theme"][value="custom"]')?.closest('.theme-option')?.querySelector('.theme-preview');
+        const val = (k) => appearance.querySelector(`[data-theme-color="${k}"]`).value;
+        const isLight = (hex) => {
+            const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+                .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4;
+        };
+        const sync = () => {
+            if (!preview) return;
+            const [bg, surface, fg, accent] = ['bg', 'surface', 'fg', 'accent'].map(val);
+            const radius = appearance.querySelector('[data-theme-radius]').value;
+            const font = appearance.querySelector('[data-theme-font]').selectedOptions[0].dataset.stack;
+            const set = (k, v) => preview.style.setProperty(k, v);
+            set('--bg', bg); set('--surface', surface); set('--fg', fg); set('--volt', accent);
+            set('--volt-ink', isLight(accent) ? '#0a0d0c' : '#ffffff');
+            set('--line', `color-mix(in srgb, ${fg} 15%, ${bg})`);
+            set('--muted', `color-mix(in srgb, ${fg} 64%, ${bg})`);
+            set('--radius', radius + 'px'); set('--sans', font);
+            appearance.querySelector('[data-radius-out]').textContent = radius;
+            appearance.querySelectorAll('[data-theme-color]').forEach((el) => (el.nextElementSibling.textContent = el.value));
+        };
+        appearance.querySelector('#custom-options').addEventListener('input', () => {
+            sync();
+            // Mexer nas opções escolhe o tema personalizado.
+            appearance.querySelector('input[name="theme"][value="custom"]').checked = true;
         });
     }
 

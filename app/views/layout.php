@@ -8,6 +8,8 @@ $footerLinks = link_lines(setting('footer_links'));
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= seo_head($meta ?? []) ?>
     <link rel="stylesheet" href="/assets/site.css?v=<?= filemtime(ROOT . '/assets/site.css') ?>">
+<?php if ($themeCss = theme_css()): ?>    <style><?= $themeCss ?></style>
+<?php endif; ?>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>

@@ -15,6 +15,7 @@ if (PHP_SAPI !== 'cli-server' && PHP_SAPI !== 'cli') {
 require __DIR__ . '/helpers.php';
 require __DIR__ . '/db.php';
 require __DIR__ . '/sanitize.php';
+require __DIR__ . '/theme.php';
 require __DIR__ . '/media.php';
 require __DIR__ . '/geoip.php';
 require __DIR__ . '/stats.php';

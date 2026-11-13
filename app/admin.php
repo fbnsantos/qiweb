@@ -65,6 +65,8 @@ function route_admin(string $sub, string $method): void
         delete_media((int) $m[1]);
         flash('Ficheiro apagado.');
         redirect('/admin/media');
+    } elseif ($sub === '/appearance') {
+        admin_appearance($method);
     } elseif ($sub === '/settings') {
         admin_settings($method);
     } elseif ($sub === '/password') {
@@ -452,4 +454,31 @@ function admin_settings(string $method): void
         redirect('/admin/settings');
     }
     admin_render('settings', ['title' => 'Definições']);
+}
+
+/* ---------- Aspeto (tema do site público; ver app/theme.php) ---------- */
+
+function admin_appearance(string $method): void
+{
+    if ($method === 'POST') {
+        $theme = (string) ($_POST['theme'] ?? '');
+        setting_set('theme', isset(THEMES[$theme]) ? $theme : 'dark');
+        if (isset($_POST['reset_custom'])) {
+            foreach (['bg', 'surface', 'fg', 'accent', 'font', 'radius', 'grid'] as $k) {
+                setting_set("theme_$k", '');
+            }
+            flash('Tema personalizado reposto com os valores iniciais.');
+            redirect('/admin/appearance');
+        }
+        foreach (array_keys(THEME_COLOR_FIELDS) as $k) {
+            setting_set("theme_$k", hex_color((string) ($_POST["theme_$k"] ?? ''), THEMES['custom'][$k]));
+        }
+        $font = (string) ($_POST['theme_font'] ?? 'sans');
+        setting_set('theme_font', isset(THEME_FONTS[$font]) ? $font : 'sans');
+        setting_set('theme_radius', (string) max(0, min(28, (int) ($_POST['theme_radius'] ?? 14))));
+        setting_set('theme_grid', isset($_POST['theme_grid']) ? '1' : '0');
+        flash('Aspeto guardado: tema "' . THEMES[current_theme()]['name'] . '".');
+        redirect('/admin/appearance');
+    }
+    admin_render('appearance', ['title' => 'Aspeto', 'theme' => current_theme(), 'custom' => theme_custom()]);
 }

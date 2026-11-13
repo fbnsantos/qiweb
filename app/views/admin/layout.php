@@ -4,6 +4,7 @@ $nav = [
     '/admin' => 'Painel',
     '/admin/home' => 'Página inicial',
     '/admin/pages' => 'Páginas',
+    '/admin/appearance' => 'Aspeto',
     '/admin/stats' => 'Estatísticas',
     '/admin/media' => 'Imagens',
     '/admin/settings' => 'Definições',

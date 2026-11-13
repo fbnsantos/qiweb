@@ -103,4 +103,5 @@
 <script src="https://cdn.jsdelivr.net/npm/tinymce@7.9.2/tinymce.min.js" integrity="sha384-C7mWIB9Vj1ePj/U7oKCJWgLbv1ttjXrW3JnNpeNjOJfwUWGBsnLtJ5X3alR5V1WU" crossorigin="anonymous" referrerpolicy="origin"></script>
 <script>
     window.EDITOR_CSS = '/assets/site.css?v=<?= filemtime(ROOT . '/assets/site.css') ?>';
+    window.EDITOR_STYLE = <?= json_encode(theme_css(), JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;
 </script>
