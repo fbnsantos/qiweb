@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-const RESERVED_SLUGS = ['admin', 'home', 'index', 'sitemap', 'robots', 'assets', 'uploads', 'favicon', 'app', 'data', 'git', 'config'];
+const RESERVED_SLUGS = ['admin', 'home', 'index', 'sitemap', 'robots', 'assets', 'uploads', 'favicon', 'app', 'data', 'git', 'config', 'contact'];
 const LOGIN_MAX_ATTEMPTS = 5;
 const LOGIN_WINDOW = 900; // 15 minutos
 
 /** Textos do topo da página inicial, guardados nas definições e editados no ecrã da página inicial. */
-const HERO_FIELDS = ['hero_eyebrow', 'site_tagline', 'hero_sub'];
+const HERO_FIELDS = ['hero_eyebrow', 'site_tagline', 'hero_sub', 'hero_cta_label', 'hero_cta_url'];
 
 function route_admin(string $sub, string $method): void
 {
@@ -65,6 +65,17 @@ function route_admin(string $sub, string $method): void
         delete_media((int) $m[1]);
         flash('Ficheiro apagado.');
         redirect('/admin/media');
+    } elseif ($sub === '/contacts') {
+        admin_render('contacts', ['title' => 'Contactos',
+            'items' => db()->query('SELECT * FROM contacts ORDER BY handled, id DESC LIMIT 500')->fetchAll()]);
+    } elseif (preg_match('#^/contacts/(\d+)/(handled|reopen|delete)$#', $sub, $m) && $method === 'POST') {
+        match ($m[2]) {
+            'handled' => db()->prepare('UPDATE contacts SET handled = 1 WHERE id = ?')->execute([(int) $m[1]]),
+            'reopen' => db()->prepare('UPDATE contacts SET handled = 0 WHERE id = ?')->execute([(int) $m[1]]),
+            'delete' => db()->prepare('DELETE FROM contacts WHERE id = ?')->execute([(int) $m[1]]),
+        };
+        flash($m[2] === 'delete' ? 'Contacto apagado.' : ($m[2] === 'handled' ? 'Marcado como tratado.' : 'Reaberto.'));
+        redirect('/admin/contacts');
     } elseif ($sub === '/appearance') {
         admin_appearance($method);
     } elseif ($sub === '/settings') {
@@ -235,6 +246,7 @@ function admin_dashboard(): void
     $counts = [
         'pages' => (int) db()->query('SELECT COUNT(*) FROM pages')->fetchColumn(),
         'media' => (int) db()->query('SELECT COUNT(*) FROM media')->fetchColumn(),
+        'contacts' => new_contacts_count(),
         'today' => stats_views_since($today),
         'views30' => stats_views_since(date('Y-m-d', strtotime('-29 days'))),
         'visitors30' => (int) $st->fetchColumn(),
@@ -271,7 +283,7 @@ function empty_page(): array
 {
     return [
         'id' => null, 'slug' => '', 'title' => '', 'menu_label' => '', 'meta_description' => '', 'content' => '',
-        'cover_image' => '', 'published' => 1, 'noindex' => 0, 'in_menu' => 1, 'menu_order' => 0,
+        'cover_image' => '', 'published' => 1, 'noindex' => 0, 'in_menu' => 1, 'menu_order' => 0, 'contact_form' => 0, 'cards' => 0,
     ];
 }
 
@@ -325,6 +337,8 @@ function admin_save(?int $id): void
         'noindex' => isset($_POST['noindex']) ? 1 : 0,
         'in_menu' => $isHome || isset($_POST['in_menu']) ? 1 : 0,
         'menu_order' => (int) $in('menu_order'),
+        'contact_form' => isset($_POST['contact_form']) ? 1 : 0,
+        'cards' => $isHome || isset($_POST['cards']) ? 1 : 0,
     ];
 
     $errors = [];
@@ -425,7 +439,7 @@ function json_error(string $msg): never
 
 /* ---------- Definições ---------- */
 
-const SETTING_FIELDS = ['site_name', 'site_description', 'site_lang', 'default_image', 'footer_text', 'footer_links', 'google_site_verification'];
+const SETTING_FIELDS = ['site_name', 'site_description', 'site_lang', 'default_image', 'footer_text', 'footer_links', 'google_site_verification', 'contact_email'];
 
 function admin_settings(string $method): void
 {

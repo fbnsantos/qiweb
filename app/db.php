@@ -21,6 +21,7 @@ function db(): PDO
     if ($fresh) {
         seed($pdo);
     }
+    seed_added_pages($pdo);
     return $pdo;
 }
 
@@ -92,7 +93,63 @@ function migrate(PDO $pdo): void
         hits INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (day, bot)
     );
+    CREATE TABLE IF NOT EXISTS contacts (
+        id INTEGER PRIMARY KEY,
+        created_at TEXT NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        organization TEXT NOT NULL DEFAULT '',
+        topic TEXT NOT NULL DEFAULT '',
+        message TEXT NOT NULL,
+        page TEXT NOT NULL DEFAULT '',
+        ip_hash TEXT NOT NULL DEFAULT '',
+        handled INTEGER NOT NULL DEFAULT 0
+    );
     SQL);
+
+    // Opções por página acrescentadas depois da primeira versão: formulário de contacto e secções em cartões.
+    $cols = array_column($pdo->query('PRAGMA table_info(pages)')->fetchAll(), 'name');
+    foreach (['contact_form', 'cards'] as $col) {
+        if (!in_array($col, $cols, true)) {
+            $pdo->exec("ALTER TABLE pages ADD COLUMN $col INTEGER NOT NULL DEFAULT 0");
+        }
+    }
+}
+
+/**
+ * Páginas do seed.php acrescentadas depois de o site já existir (marcadas com 'added' => 'chave'):
+ * são criadas uma única vez em bases de dados antigas, sem tocar no que já lá está.
+ */
+function seed_added_pages(PDO $pdo): void
+{
+    $done = $pdo->query("SELECT name FROM settings WHERE name LIKE 'seeded_%'")->fetchAll(PDO::FETCH_COLUMN);
+    $data = null;
+    foreach (['work_with_us'] as $key) {
+        if (in_array("seeded_$key", $done, true)) {
+            continue;
+        }
+        $data ??= require __DIR__ . '/seed.php';
+        foreach ($data['pages'] as $p) {
+            if (($p['added'] ?? '') === $key) {
+                insert_seed_page($pdo, $p);
+            }
+        }
+        $st = $pdo->prepare('INSERT OR IGNORE INTO settings (name, value) VALUES (?, ?)');
+        foreach ($data['added_settings'][$key] ?? [] as $k => $v) {
+            $st->execute([$k, $v]);
+        }
+        $st->execute(["seeded_$key", '1']);
+    }
+}
+
+function insert_seed_page(PDO $pdo, array $p): void
+{
+    $now = now();
+    $pdo->prepare('INSERT OR IGNORE INTO pages (slug, title, menu_label, meta_description, content, in_menu, menu_order,
+            noindex, contact_form, cards, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$p['slug'], $p['title'], $p['menu_label'] ?? '', $p['description'] ?? '', sanitize_html($p['content']),
+            $p['in_menu'] ?? 0, $p['menu_order'] ?? 0, $p['noindex'] ?? 0, $p['contact_form'] ?? 0, $p['cards'] ?? 0, $now, $now]);
 }
 
 /** Conteúdo inicial (o que estava em qivolt.com); depois edita-se tudo no backoffice. */
@@ -105,11 +162,8 @@ function seed(PDO $pdo): void
     foreach ($data['settings'] as $k => $v) {
         $st->execute([$k, $v]);
     }
-    $st = $pdo->prepare('INSERT INTO pages (slug, title, menu_label, meta_description, content, in_menu, menu_order, noindex, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     foreach ($data['pages'] as $p) {
-        $st->execute([$p['slug'], $p['title'], $p['menu_label'] ?? '', $p['description'] ?? '', sanitize_html($p['content']),
-            $p['in_menu'] ?? 0, $p['menu_order'] ?? 0, $p['noindex'] ?? 0, $now, $now]);
+        insert_seed_page($pdo, $p);
     }
 }
 

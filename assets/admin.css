@@ -157,7 +157,7 @@ table.card { padding: 0; overflow: hidden; display: table; }
 .api-instructions { width: 100%; font-family: ui-monospace, monospace; font-size: 0.8rem; }
 .settings-grid + .card { margin-top: 16px; }
 .badge.review { background: #ede9fe; color: #5b21b6; text-decoration: none; }
-.side nav .count { display: inline-block; min-width: 18px; padding: 0 6px; border-radius: 99px; background: #7c3aed; color: #fff; font-size: 0.72rem; text-align: center; }
+.side nav .count { display: inline-block; min-width: 18px; padding: 0 6px; border-radius: 99px; background: var(--danger); color: #fff; font-size: 0.72rem; text-align: center; }
 .review-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .review-banner.pending { border-color: #a78bfa; background: #f5f3ff; }
 .review-banner.rejected { border-color: #fca5a5; }
@@ -278,3 +278,9 @@ details.card[open] > summary { margin-bottom: 14px; }
 .color-field { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
 .color-field input[type="color"] { width: 52px; height: 36px; padding: 2px; margin: 0; cursor: pointer; }
 input[type="range"] { padding: 0; }
+
+/* Contactos recebidos */
+.contact-item.handled { opacity: 0.7; }
+.contact-head { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
+.contact-meta { text-align: right; }
+.contact-message { margin: 14px 0; padding: 12px 14px; background: var(--bg); border-radius: 8px; overflow-wrap: anywhere; }

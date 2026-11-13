@@ -20,6 +20,13 @@
         <textarea name="footer_links" rows="4" placeholder="Privacy | /pkmt-privacy"><?= e(setting('footer_links')) ?></textarea>
     </label>
 
+    <h3>Contactos</h3>
+    <label>Email para receber aviso de cada novo contacto (opcional)
+        <input type="email" name="contact_email" value="<?= e(setting('contact_email')) ?>" placeholder="nome@exemplo.com">
+    </label>
+    <p class="hint">Os pedidos ficam sempre guardados em <a href="/admin/contacts">Contactos</a>. O aviso por email depende do
+        servidor conseguir enviar correio; se não chegar, confirme na lista.</p>
+
     <h3>Google e partilha</h3>
     <label class="check"><input type="checkbox" name="allow_indexing" <?= setting('allow_indexing', '1') === '1' ? 'checked' : '' ?>>
         Permitir que o Google indexe o site</label>

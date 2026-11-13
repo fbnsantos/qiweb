@@ -34,6 +34,12 @@
                     <label>Frase por baixo do lema
                         <input name="hero_sub" value="<?= e($hero['hero_sub']) ?>" maxlength="300">
                     </label>
+                    <label>Botão: texto <span class="muted small">(vazio = sem botão)</span>
+                        <input name="hero_cta_label" value="<?= e($hero['hero_cta_label']) ?>" maxlength="60" placeholder="Work with us">
+                    </label>
+                    <label>Botão: endereço
+                        <input name="hero_cta_url" value="<?= e($hero['hero_cta_url']) ?>" maxlength="300" placeholder="/work-with-us">
+                    </label>
                 </section>
             <?php endif; ?>
 
@@ -61,6 +67,16 @@
                     <label>Ordem no menu <input type="number" name="menu_order" value="<?= (int) $item['menu_order'] ?>"></label>
                 </section>
             <?php endif; ?>
+
+            <section class="card">
+                <h3>Opções da página</h3>
+                <?php if (!$isHome): ?>
+                    <label class="check"><input type="checkbox" name="cards" <?= $item['cards'] ? 'checked' : '' ?>> Secções em cartões</label>
+                    <p class="hint">Duas ou mais secções seguidas com “Título 2” ficam lado a lado; uma linha horizontal separa blocos.</p>
+                <?php endif; ?>
+                <label class="check"><input type="checkbox" name="contact_form" <?= $item['contact_form'] ? 'checked' : '' ?>> Mostrar formulário de contacto</label>
+                <p class="hint">Aparece no fim da página. Os pedidos ficam em <a href="/admin/contacts">Contactos</a>.</p>
+            </section>
 
             <section class="card">
                 <h3>Google</h3>

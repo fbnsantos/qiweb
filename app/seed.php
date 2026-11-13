@@ -12,8 +12,72 @@ return [
         'footer_text' => '',
         'footer_links' => "PKMT Privacy Policy | /pkmt-privacy\nPKMT Terms of Use | /pkmt-terms\nFNdS | https://www.fbnsantos.com",
         'allow_indexing' => '1',
+        'hero_cta_label' => 'Work with us',
+        'hero_cta_url' => '/work-with-us',
+    ],
+    // Definições que acompanham páginas acrescentadas mais tarde (ver seed_added_pages() em db.php).
+    'added_settings' => [
+        'work_with_us' => ['hero_cta_label' => 'Work with us', 'hero_cta_url' => '/work-with-us'],
     ],
     'pages' => [
+        [
+            'added' => 'work_with_us',
+            'slug' => 'work-with-us',
+            'title' => 'Work with us',
+            'description' => 'Technology consulting, European project proposals, engineering and robotics projects, and independent expert opinions in robotics, autonomous systems and intelligent sensing.',
+            'in_menu' => 1,
+            'menu_order' => 0,
+            'contact_form' => 1,
+            'cards' => 1,
+            'content' => <<<'HTML'
+<p><strong>Independent technology consulting in robotics, autonomous systems and intelligent sensing</strong> — from the first idea to a funded project and a machine that works in the field.</p>
+<p>QIVOLT helps companies, research organisations and public bodies decide what to build, win the funding to build it, and deliver it. Every engagement is led by <a href="https://www.fbnsantos.com">FNdS</a>, drawing on decades of field-hardened work in agricultural, forestry and outdoor robotics.</p>
+<hr>
+<h2>🧭 Technology consulting</h2>
+<p>Clear, vendor-neutral advice for decisions that are expensive to get wrong.</p>
+<ul>
+<li>Technology roadmaps and make-or-buy decisions</li>
+<li>Architecture reviews of robotic, sensing and IoT systems</li>
+<li>Technology scouting, benchmarking and due diligence</li>
+<li>Workshops and mentoring for engineering and R&amp;D teams</li>
+</ul>
+<h2>🌍 European project proposals</h2>
+<p>From a promising idea to a competitive, fundable proposal — Horizon Europe, EIC, Eurostars, and national and regional programmes.</p>
+<ul>
+<li>Concept, objectives and positioning against the call</li>
+<li>Consortium building and partner search</li>
+<li>Writing and critical review of excellence, impact and implementation</li>
+<li>Work plan, budget and risk structure</li>
+<li>Pre-submission review from an evaluator's point of view</li>
+</ul>
+<h2>🤖 Engineering and robotics projects</h2>
+<p>Hands-on engineering for machines that must work outside the lab.</p>
+<ul>
+<li>Feasibility studies and proofs of concept</li>
+<li>Perception, localisation, navigation and manipulation</li>
+<li>Sensor selection, integration and IoT data pipelines</li>
+<li>Field trials, validation and performance reports</li>
+<li>From prototype to pilot and technology transfer</li>
+</ul>
+<h2>📑 Expert opinions and technical reviews</h2>
+<p>Independent, written and signed assessments you can put in front of a board, an investor or a funding body.</p>
+<ul>
+<li>Technical opinions on products, systems and R&amp;D results</li>
+<li>Technology assessment for investment and procurement decisions</li>
+<li>Review of project deliverables and progress</li>
+<li>State-of-the-art and technology landscape reports</li>
+</ul>
+<hr>
+<h2>How it works</h2>
+<ol>
+<li><strong>Tell us about your challenge</strong> — use the form below. A few lines are enough.</li>
+<li><strong>Scoping call</strong> — a short conversation to understand the goal, the constraints and the deadline.</li>
+<li><strong>Fixed-scope proposal</strong> — deliverables, timeline and price agreed before any work starts.</li>
+<li><strong>Delivery</strong> — from a one-day review to a multi-month engagement, with a single point of contact.</li>
+</ol>
+<p>Everything you share is treated as confidential. A non-disclosure agreement can be signed before the first call.</p>
+HTML,
+        ],
         [
             'slug' => 'home',
             'title' => 'QIVOLT',

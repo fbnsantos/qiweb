@@ -11,7 +11,7 @@
     <a class="stat" href="/admin/stats?dias=7"><b><?= $n($counts['today']) ?></b><span>visualizações hoje</span></a>
     <a class="stat" href="/admin/stats"><b><?= $n($counts['views30']) ?></b><span>visualizações (30 dias)</span></a>
     <a class="stat" href="/admin/stats"><b><?= $n($counts['visitors30']) ?></b><span>visitantes (30 dias)</span></a>
-    <a class="stat" href="/admin/pages"><b><?= $n($counts['pages']) ?></b><span>páginas</span></a>
+    <a class="stat" href="/admin/contacts"><b><?= $n($counts['contacts']) ?></b><span>contactos por tratar</span></a>
 </div>
 
 <section class="card">

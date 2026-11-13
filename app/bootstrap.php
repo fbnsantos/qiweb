@@ -19,6 +19,7 @@ require __DIR__ . '/theme.php';
 require __DIR__ . '/media.php';
 require __DIR__ . '/geoip.php';
 require __DIR__ . '/stats.php';
+require __DIR__ . '/contact.php';
 
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');

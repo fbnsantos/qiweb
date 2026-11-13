@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 function route_site(string $path): void
 {
+    if ($path === '/contact') {
+        // Só recebe o envio do formulário de contacto; não é uma página.
+        ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? contact_submit() : redirect('/', 302);
+        return;
+    }
     switch ($path) {
         case '/':
             show_page('home');
@@ -31,7 +36,7 @@ function route_site(string $path): void
     not_found();
 }
 
-function show_page(string $slug): void
+function show_page(string $slug, array $form = []): void
 {
     $page = find_page($slug);
     // Rascunhos só se veem com sessão iniciada no backoffice (pré-visualização).
@@ -53,7 +58,7 @@ function show_page(string $slug): void
         'image' => $page['cover_image'],
         'noindex' => (bool) $page['noindex'] || $preview,
     ];
-    render($isHome ? 'home' : 'page', compact('page', 'meta', 'preview'));
+    render($isHome ? 'home' : 'page', compact('page', 'meta', 'preview', 'form'));
 }
 
 function not_found(): void

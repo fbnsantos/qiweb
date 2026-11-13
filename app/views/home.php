@@ -5,6 +5,9 @@
         <h1><?= e($page['title']) ?></h1>
         <?php if (setting('site_tagline')): ?><p class="hero-tagline"><?= e(setting('site_tagline')) ?></p><?php endif; ?>
         <?php if (setting('hero_sub')): ?><p class="hero-sub"><?= e(setting('hero_sub')) ?></p><?php endif; ?>
+        <?php if (setting('hero_cta_label') && safe_url(setting('hero_cta_url'), true)): ?>
+            <p class="hero-cta"><a class="button" href="<?= e(setting('hero_cta_url')) ?>"><?= e(setting('hero_cta_label')) ?> →</a></p>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -23,3 +26,8 @@
         <section class="wrap prose home-prose<?= $i === 0 ? ' lead' : ' closing' ?>"><?= $body ?></section>
     <?php endif; ?>
 <?php endforeach; ?>
+
+<?php if ($page['contact_form']) {
+    require __DIR__ . '/partials/contact-form.php';
+    echo '<div class="page-end"></div>';
+} ?>

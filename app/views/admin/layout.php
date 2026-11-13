@@ -4,6 +4,7 @@ $nav = [
     '/admin' => 'Painel',
     '/admin/home' => 'Página inicial',
     '/admin/pages' => 'Páginas',
+    '/admin/contacts' => 'Contactos',
     '/admin/appearance' => 'Aspeto',
     '/admin/stats' => 'Estatísticas',
     '/admin/media' => 'Imagens',
@@ -35,7 +36,8 @@ $flash = flash();
                     '/admin/pages' => str_starts_with($path, $href) && !$isHomeEdit,
                     default => str_starts_with($path, $href),
                 }; ?>
-                <a href="<?= $href ?>"<?= $active ? ' class="active"' : '' ?>><?= $label ?></a>
+                <a href="<?= $href ?>"<?= $active ? ' class="active"' : '' ?>><?= $label ?><?php
+                    if ($href === '/admin/contacts' && ($newContacts = new_contacts_count())): ?> <span class="count"><?= $newContacts ?></span><?php endif; ?></a>
             <?php endforeach; ?>
         </nav>
         <div class="side-foot">
