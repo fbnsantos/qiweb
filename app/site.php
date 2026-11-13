@@ -22,12 +22,25 @@ function route_site(string $path): void
             header('Content-Type: application/xml; charset=utf-8');
             echo sitemap_xml();
             return;
+        case '/llms.txt':
+            header('Content-Type: text/plain; charset=utf-8');
+            echo llms_txt();
+            return;
+        case '/og.png':
+            serve_og_image();
+            return;
         case '/favicon.svg':
         case '/favicon.ico':
             header('Content-Type: image/svg+xml');
             header('Cache-Control: public, max-age=604800');
             echo favicon_svg();
             return;
+    }
+    // Chave do IndexNow: o Bing confirma que o site é nosso pedindo /<chave>.txt.
+    if (preg_match('#^/([a-f0-9]{32})\.txt$#', $path, $m) && hash_equals(indexnow_key(), $m[1])) {
+        header('Content-Type: text/plain; charset=utf-8');
+        echo $m[1];
+        return;
     }
     if (preg_match('#^/([a-z0-9_-]+)$#', $path, $m)) {
         show_page($m[1]);
@@ -50,6 +63,7 @@ function show_page(string $slug, array $form = []): void
         track_view($isHome ? 'home' : 'page', (int) $page['id']);
     }
     $meta = [
+        'og_title' => $page['title'],
         'title' => $isHome
             ? setting('site_name') . (setting('site_tagline') ? ' — ' . setting('site_tagline') : '')
             : $page['title'] . ' — ' . setting('site_name'),
@@ -126,6 +140,12 @@ function seo_head(array $m): string
         $out .= '    <meta property="og:description" content="' . e($desc) . "\">\n";
     }
     $image = ($m['image'] ?? '') ?: setting('default_image');
+    if ($image === '' && og_available()) {
+        // Sem capa: imagem 1200×630 gerada com o título da página.
+        $image = og_image_url($m['og_title'] ?? $title);
+        $out .= '    <meta property="og:image:width" content="' . OG_W . "\">\n";
+        $out .= '    <meta property="og:image:height" content="' . OG_H . "\">\n";
+    }
     if ($image !== '') {
         $out .= '    <meta property="og:image" content="' . e(abs_url($image)) . "\">\n";
         $out .= '    <meta name="twitter:card" content="summary_large_image">' . "\n";
@@ -151,11 +171,18 @@ function robots_txt(): string
 
 function sitemap_xml(): string
 {
-    $out = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $out = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+        . ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
     if (indexing_allowed()) {
-        foreach (db()->query("SELECT slug, updated_at FROM pages WHERE published = 1 AND noindex = 0 ORDER BY slug <> 'home', slug") as $p) {
+        foreach (db()->query("SELECT * FROM pages WHERE published = 1 AND noindex = 0 ORDER BY slug <> 'home', slug") as $p) {
             $out .= '  <url><loc>' . xml(abs_url($p['slug'] === 'home' ? '/' : '/' . $p['slug'])) . '</loc><lastmod>'
-                . date('Y-m-d', strtotime($p['updated_at'])) . "</lastmod></url>\n";
+                . date('Y-m-d', strtotime($p['updated_at'])) . '</lastmod>';
+            // Imagem de capa e imagens do texto, para o Google Imagens.
+            $images = array_filter(array_merge([$p['cover_image']], content_images($p['content'])));
+            foreach (array_slice(array_unique($images), 0, 20) as $src) {
+                $out .= '<image:image><image:loc>' . xml(abs_url($src)) . '</image:loc></image:image>';
+            }
+            $out .= "</url>\n";
         }
     }
     return $out . "</urlset>\n";

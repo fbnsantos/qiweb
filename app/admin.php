@@ -386,6 +386,9 @@ function admin_save(?int $id): void
             setting_set($k, mb_substr($in($k), 0, 300));
         }
     }
+    if ($item['published'] && !$item['noindex']) {
+        indexnow_ping([public_url($item)]);
+    }
     flash('Guardado.');
     redirect("/admin/pages/$id");
 }

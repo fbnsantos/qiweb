@@ -43,9 +43,25 @@
 </section>
 
 <section class="card">
-    <h2>Google</h2>
+    <h2>SEO e Google</h2>
+    <p class="muted">Gerado automaticamente a partir do conteúdo:</p>
     <ul class="links">
-        <li><a href="/robots.txt" target="_blank">robots.txt</a> e <a href="/sitemap.xml" target="_blank">sitemap.xml</a> são gerados automaticamente</li>
+        <li><a href="/robots.txt" target="_blank">robots.txt</a></li>
+        <li><a href="/sitemap.xml" target="_blank">sitemap.xml</a> (páginas e imagens)</li>
+        <li><a href="/llms.txt" target="_blank">llms.txt</a> (resumo para ChatGPT, Perplexity e outros motores com IA)</li>
+        <li>
+            <?php if (og_available()): ?>
+                <a href="<?= e(og_image_url(setting('site_name'))) ?>" target="_blank">Imagens de partilha 1200×630</a>
+                geradas para cada página sem capa, com as cores do tema
+            <?php else: ?>
+                <span class="muted">Imagens de partilha: indisponíveis (falta a extensão GD do PHP neste servidor)</span>
+            <?php endif; ?>
+        </li>
+        <li>
+            <?php if (indexnow_active()): ?>IndexNow avisa o Bing ao guardar uma página publicada
+            <?php else: ?><span class="muted">IndexNow: desligado (só funciona no domínio público e com a indexação permitida)</span><?php endif; ?>
+        </li>
+        <li><a href="https://search.google.com/test/rich-results?url=<?= e(rawurlencode(abs_url('/'))) ?>" target="_blank" rel="noopener">Testar dados estruturados no Google ↗</a></li>
         <li><a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console ↗</a></li>
     </ul>
 </section>

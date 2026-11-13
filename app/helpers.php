@@ -124,6 +124,7 @@ function text_excerpt(string $html, int $len = 160): string
 {
     $text = html_entity_decode(strip_tags(str_replace('<', ' <', $html)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+    $text = preg_replace('/ ([,.;:!?])/u', '$1', $text) ?? $text; // espaço deixado por tags antes da pontuação
     if (mb_strlen($text) <= $len) {
         return $text;
     }

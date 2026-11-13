@@ -76,4 +76,18 @@ Os endereços do site antigo (`index.php?page=pkmt-privacy`, `…?page=pkmt_manu
 - Limite de 5 tentativas / 15 min por IP no login e no setup.
 - HTML do editor filtrado por lista branca (sem scripts nem iframes que não sejam YouTube).
 - Uploads validados pelo conteúdo real, com nomes aleatórios e sem execução de PHP em `uploads/`.
+- Imagens de partilha (`/og.png`) com URL assinado: ninguém gera imagens com texto arbitrário no domínio.
 - `git.php` exige a assinatura HMAC do GitHub ou o token, comparados em tempo constante.
+
+## SEO (automático)
+
+| O quê | Onde |
+|---|---|
+| `robots.txt` | `/robots.txt` — bloqueia `/admin` e aponta para o sitemap. Desligar "Permitir indexação" nas Definições bloqueia tudo. |
+| Sitemap | `/sitemap.xml` — páginas publicadas e as suas imagens, com `lastmod` |
+| `llms.txt` | `/llms.txt` — resumo do site e dos serviços em Markdown, para ChatGPT, Perplexity e outros motores com IA |
+| `<head>` | title, meta description, canonical, meta robots, Open Graph, verificação Google, JSON-LD `Organization` |
+| Imagens de partilha | `/og.png` gera 1200×630 com o título de cada página sem capa, nas cores do tema (em cache em `data/og/`). Precisa da extensão `gd` com FreeType. |
+| IndexNow | Ao guardar uma página publicada, avisa Bing/Yandex/Seznam (o Google usa o sitemap). Chave servida em `/<chave>.txt` |
+
+Não há `feed.xml` (RSS): o site não tem artigos.

@@ -20,6 +20,7 @@ require __DIR__ . '/media.php';
 require __DIR__ . '/geoip.php';
 require __DIR__ . '/stats.php';
 require __DIR__ . '/contact.php';
+require __DIR__ . '/seo.php';
 
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
