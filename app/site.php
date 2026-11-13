@@ -150,6 +150,9 @@ function seo_head(array $m): string
         $out .= '    <meta property="og:image" content="' . e(abs_url($image)) . "\">\n";
         $out .= '    <meta name="twitter:card" content="summary_large_image">' . "\n";
     }
+    if (setting('bing_site_verification')) {
+        $out .= '    <meta name="msvalidate.01" content="' . e(setting('bing_site_verification')) . "\">\n";
+    }
     if (setting('google_site_verification')) {
         $out .= '    <meta name="google-site-verification" content="' . e(setting('google_site_verification')) . "\">\n";
     }

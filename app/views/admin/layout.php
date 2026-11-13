@@ -7,6 +7,7 @@ $nav = [
     '/admin/contacts' => 'Contactos',
     '/admin/appearance' => 'Aspeto',
     '/admin/stats' => 'Estatísticas',
+    '/admin/seo' => 'SEO',
     '/admin/media' => 'Imagens',
     '/admin/settings' => 'Definições',
     '/admin/update' => 'Atualizar (git)',

@@ -78,6 +78,8 @@ function route_admin(string $sub, string $method): void
         redirect('/admin/contacts');
     } elseif ($sub === '/appearance') {
         admin_appearance($method);
+    } elseif ($sub === '/seo') {
+        admin_seo($method);
     } elseif ($sub === '/settings') {
         admin_settings($method);
     } elseif ($sub === '/password') {
@@ -442,30 +444,17 @@ function json_error(string $msg): never
 
 /* ---------- Definições ---------- */
 
-const SETTING_FIELDS = ['site_name', 'site_description', 'site_lang', 'default_image', 'footer_text', 'footer_links', 'google_site_verification', 'contact_email'];
+const SETTING_FIELDS = ['site_name', 'site_lang', 'footer_text', 'footer_links', 'contact_email'];
 
 function admin_settings(string $method): void
 {
     if ($method === 'POST') {
         foreach (SETTING_FIELDS as $k) {
             $v = trim((string) ($_POST[$k] ?? ''));
-            // Aceita a meta tag inteira colada do Search Console e extrai só o código.
-            if ($k === 'google_site_verification' && preg_match('/content="([^"]+)"/', $v, $m)) {
-                $v = $m[1];
-            }
             if ($k === 'site_name' && $v === '') {
                 continue;
             }
             setting_set($k, $v);
-        }
-        setting_set('allow_indexing', isset($_POST['allow_indexing']) ? '1' : '0');
-        if (!empty($_FILES['default_image_file']['name'])) {
-            try {
-                setting_set('default_image', handle_upload($_FILES['default_image_file'], setting('site_name'))['url']);
-            } catch (RuntimeException $ex) {
-                flash($ex->getMessage(), 'error');
-                redirect('/admin/settings');
-            }
         }
         flash('Definições guardadas.');
         redirect('/admin/settings');
@@ -498,4 +487,76 @@ function admin_appearance(string $method): void
         redirect('/admin/appearance');
     }
     admin_render('appearance', ['title' => 'Aspeto', 'theme' => current_theme(), 'custom' => theme_custom()]);
+}
+
+/* ---------- SEO: visão geral, avisos por página e opções dos motores de pesquisa ---------- */
+
+/** Uma linha por página, com o que o Google vai ver e os avisos a corrigir. */
+function seo_audit(): array
+{
+    $rows = [];
+    foreach (db()->query("SELECT * FROM pages ORDER BY slug <> 'home', in_menu DESC, menu_order, title") as $p) {
+        $isHome = $p['slug'] === 'home';
+        $indexable = $p['published'] && !$p['noindex'] && indexing_allowed();
+        $descLen = mb_strlen($p['meta_description']);
+        $tagTitle = $isHome
+            ? setting('site_name') . (setting('site_tagline') ? ' — ' . setting('site_tagline') : '')
+            : $p['title'] . ' — ' . setting('site_name');
+        $warnings = [];
+        if ($p['published'] && !$p['noindex']) {
+            if ($descLen === 0 && !($isHome && setting('site_description') !== '')) {
+                $warnings[] = 'Sem descrição: o Google usa um excerto do texto.';
+            } elseif ($descLen > 0 && $descLen < 70) {
+                $warnings[] = 'Descrição curta (menos de 70 caracteres).';
+            } elseif ($descLen > 160) {
+                $warnings[] = 'Descrição longa: o Google corta depois de ~160 caracteres.';
+            }
+            if (mb_strlen($tagTitle) > 65) {
+                $warnings[] = 'Título longo (' . mb_strlen($tagTitle) . ' caracteres com o nome do site): o Google corta depois de ~60.';
+            }
+            if (mb_strlen(text_excerpt($p['content'], 400)) < 200) {
+                $warnings[] = 'Pouco texto na página.';
+            }
+        }
+        $image = $p['cover_image'] ?: setting('default_image');
+        $rows[] = [
+            'id' => $p['id'], 'title' => $p['title'], 'url' => $isHome ? '/' : '/' . $p['slug'],
+            'published' => (bool) $p['published'], 'indexable' => $indexable, 'desc_len' => $descLen,
+            'image' => $image ?: (og_available() ? og_image_url($p['title']) : '#'),
+            'image_kind' => $p['cover_image'] ? 'Capa' : (setting('default_image') ? 'Por omissão' : (og_available() ? 'Gerada' : 'Nenhuma')),
+            'warnings' => $warnings,
+        ];
+    }
+    return $rows;
+}
+
+function admin_seo(string $method): void
+{
+    if ($method === 'POST') {
+        setting_set('allow_indexing', isset($_POST['allow_indexing']) ? '1' : '0');
+        setting_set('site_description', mb_substr(trim((string) ($_POST['site_description'] ?? '')), 0, 300));
+        foreach (['google_site_verification', 'bing_site_verification'] as $k) {
+            $v = trim((string) ($_POST[$k] ?? ''));
+            // Aceita a meta tag inteira colada da ferramenta e extrai só o código.
+            if (preg_match('/content="([^"]+)"/', $v, $m)) {
+                $v = $m[1];
+            }
+            setting_set($k, preg_replace('/[^A-Za-z0-9_\-=.]/', '', $v) ?? '');
+        }
+        $image = trim((string) ($_POST['default_image'] ?? ''));
+        setting_set('default_image', $image === '' || safe_url($image, false) ? $image : setting('default_image'));
+        if (!empty($_FILES['default_image_file']['name'])) {
+            try {
+                setting_set('default_image', handle_upload($_FILES['default_image_file'], setting('site_name'))['url']);
+            } catch (RuntimeException $ex) {
+                flash($ex->getMessage(), 'error');
+                redirect('/admin/seo');
+            }
+        }
+        flash('Opções de SEO guardadas.');
+        redirect('/admin/seo');
+    }
+    $pages = seo_audit();
+    admin_render('seo', ['title' => 'SEO', 'pages' => $pages,
+        'problems' => count(array_filter($pages, fn($p) => $p['warnings']))]);
 }

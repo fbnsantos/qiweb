@@ -7,7 +7,7 @@ return [
         'hero_eyebrow' => 'Robotics · Intelligent sensing',
         'site_tagline' => 'Precision. Autonomy. Purpose.',
         'hero_sub' => 'Where machines become sentient agents of terrain, orbit, and intent.',
-        'site_description' => 'QIVOLT operates at the convergence of robotics and intelligent sensing, crafting systems that thrive where others fail: agriculture, forest, space and strategic autonomy.',
+        'site_description' => 'QIVOLT builds robotics and intelligent sensing systems that thrive where others fail: agriculture, forest, space and strategic autonomy.',
         'site_lang' => 'en',
         'footer_text' => '',
         'footer_links' => "PKMT Privacy Policy | /pkmt-privacy\nPKMT Terms of Use | /pkmt-terms\nFNdS | https://www.fbnsantos.com",
@@ -24,7 +24,7 @@ return [
             'added' => 'work_with_us',
             'slug' => 'work-with-us',
             'title' => 'Work with us',
-            'description' => 'Technology consulting, European project proposals, engineering and robotics projects, and independent expert opinions in robotics, autonomous systems and intelligent sensing.',
+            'description' => 'Technology consulting, European project proposals, robotics engineering and independent expert opinions in autonomous systems and intelligent sensing.',
             'in_menu' => 1,
             'menu_order' => 0,
             'contact_form' => 1,
@@ -264,7 +264,7 @@ HTML,
         [
             'slug' => 'pkmt-terms',
             'title' => 'Terms of Use – PKMT',
-            'description' => 'Terms of Use of the PKMT application.',
+            'description' => 'Terms of Use of the PKMT application: eligibility, user responsibilities, data, availability and liability.',
             'content' => <<<'HTML'
 <p>By accessing and using the <strong>PKMT</strong> application ("the Service"), you agree to comply with and be bound by the following Terms of Use. If you do not agree with any part of these terms, please do not use the Service.</p>
 <h2>1. Description of the Service</h2>
