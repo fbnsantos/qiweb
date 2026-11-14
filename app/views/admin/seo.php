@@ -116,7 +116,7 @@ $host = preg_replace('#^https?://#', '', base_url());
         </tr>
         <tr>
             <td>Dados estruturados</td>
-            <td class="muted">JSON-LD <code>Organization</code> na página inicial ·
+            <td class="muted">JSON-LD: organização, logótipo e site na página inicial; caminho “Home › Página” nas outras ·
                 <a href="https://search.google.com/test/rich-results?url=<?= e(rawurlencode(abs_url('/'))) ?>" target="_blank" rel="noopener">testar no Google ↗</a></td>
         </tr>
     </table>

@@ -239,3 +239,63 @@ function llms_txt(): string
     }
     return implode("\n", $md) . "\n";
 }
+
+/* ---------- Logótipo em PNG (dados estruturados: o Google prefere uma imagem quadrada, não o favicon SVG) ---------- */
+
+function logo_url(): string
+{
+    return function_exists('imagecreatetruecolor') ? '/logo.png' : '/favicon.svg';
+}
+
+function serve_logo(): void
+{
+    if (!function_exists('imagecreatetruecolor')) {
+        http_response_code(404);
+        return;
+    }
+    $file = ROOT . '/data/og/logo.png';
+    if (!is_file($file)) {
+        if (!is_dir(dirname($file))) {
+            mkdir(dirname($file), 0775, true);
+        }
+        $im = imagecreatetruecolor(512, 512);
+        imageantialias($im, true);
+        imagefilledrectangle($im, 0, 0, 512, 512, imagecolorallocate($im, 0x0a, 0x0d, 0x0c));
+        // O mesmo raio do favicon e do cabeçalho.
+        $points = array_map(fn($v) => (int) round(64 + $v * 16), [14, 1, 4, 14, 10.5, 14, 9, 23, 20, 9, 13, 9]);
+        imagefilledpolygon($im, $points, imagecolorallocate($im, 0xc6, 0xf4, 0x32));
+        imagepng($im, $file, 6);
+    }
+    header('Content-Type: image/png');
+    header('Cache-Control: public, max-age=604800');
+    header('Content-Length: ' . filesize($file));
+    readfile($file);
+}
+
+/**
+ * Dados estruturados (JSON-LD) de uma página: na página inicial, a organização e o site;
+ * nas outras, o caminho "Home › Página", que o Google mostra no resultado em vez do endereço.
+ */
+function page_schema(array $m): array
+{
+    $org = abs_url('/') . '#organization';
+    if (($m['path'] ?? '') === '/') {
+        return ['@context' => 'https://schema.org', '@graph' => [
+            array_filter([
+                '@type' => 'Organization', '@id' => $org, 'name' => setting('site_name'), 'url' => abs_url('/'),
+                'logo' => abs_url(logo_url()), 'description' => setting('site_description'), 'slogan' => setting('site_tagline'),
+            ]),
+            array_filter([
+                '@type' => 'WebSite', '@id' => abs_url('/') . '#website', 'url' => abs_url('/'), 'name' => setting('site_name'),
+                'inLanguage' => setting('site_lang', 'en'), 'publisher' => ['@id' => $org],
+            ]),
+        ]];
+    }
+    if (!empty($m['crumb']) && isset($m['path'])) {
+        return ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => abs_url('/')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $m['crumb'], 'item' => abs_url($m['path'])],
+        ]];
+    }
+    return [];
+}

@@ -26,6 +26,9 @@ function route_site(string $path): void
             header('Content-Type: text/plain; charset=utf-8');
             echo llms_txt();
             return;
+        case '/logo.png':
+            serve_logo();
+            return;
         case '/og.png':
             serve_og_image();
             return;
@@ -70,6 +73,7 @@ function show_page(string $slug, array $form = []): void
         'description' => $page['meta_description'] ?: ($isHome ? setting('site_description') : '') ?: text_excerpt($page['content']),
         'path' => $isHome ? '/' : '/' . $slug,
         'image' => $page['cover_image'],
+        'crumb' => $isHome ? '' : ($page['menu_label'] ?: $page['title']),
         'noindex' => (bool) $page['noindex'] || $preview,
     ];
     render($isHome ? 'home' : 'page', compact('page', 'meta', 'preview', 'form'));
@@ -156,10 +160,8 @@ function seo_head(array $m): string
     if (setting('google_site_verification')) {
         $out .= '    <meta name="google-site-verification" content="' . e(setting('google_site_verification')) . "\">\n";
     }
-    if (($m['path'] ?? '') === '/') {
-        $schema = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => setting('site_name'),
-            'url' => abs_url('/'), 'description' => setting('site_description')];
-        $out .= '    <script type="application/ld+json">' . json_encode(array_filter($schema), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) . "</script>\n";
+    if ($schema = page_schema($m)) {
+        $out .= '    <script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) . "</script>\n";
     }
     return $out . '    <link rel="icon" href="/favicon.svg" type="image/svg+xml">' . "\n";
 }
